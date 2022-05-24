@@ -35,7 +35,6 @@ def send_prompt(personality, prompt):
         return None
     
     response_json = response.json()
-    print("gpt2 chatbot response...", response.content)
     return response_json['response']
 
 @app.event("app_mention")
