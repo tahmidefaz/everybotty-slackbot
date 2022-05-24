@@ -52,12 +52,12 @@ def handle_mention(body, say, logger):
     splitted_message = text.split(" ")
 
     if len(splitted_message) == 2 and splitted_message[-1] == "personalities":
-        say(f'Here are the available personalities:\n{" ".join(formatted_personalities)}')
+        say(f'Here are the available personalities:\n{" ".join(formatted_personalities)}\nUsage: `bot-personality your message`\n')
         return
 
     bot_personality = splitted_message[1]
     if bot_personality not in personalities:
-        say(f'Bot personality, {bot_personality}, does not exist. Available personalities:\n{" ".join(formatted_personalities)}')
+        say(f'Bot personality, {bot_personality}, does not exist.\nUsage: `bot-personality your message`\nAvailable personalities:\n{" ".join(formatted_personalities)}')
         return
 
     prompt = " ".join(splitted_message[2:])
