@@ -67,7 +67,7 @@ def handle_reply(logger, event, say):
     prompts.append(text)
 
     if len(prompts) > 11:
-        prompts = prompts[1:]
+        prompts = prompts[2:]
 
     formatted_prompts = format_prompts(prompts)
 
