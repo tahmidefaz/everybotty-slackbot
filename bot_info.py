@@ -3,7 +3,7 @@ BOT_ICONS = {
         "icon_url": "https://raw.githubusercontent.com/tahmidefaz/everybotty-slackbot/main/icons/gaga-emoji.jpeg"
     },
     "git-bot": {
-        "icon_url": "https://raw.githubusercontent.com/tahmidefaz/everybotty-slackbot/main/icons/git-emoji.png"
+        "icon_url": "https://raw.githubusercontent.com/tahmidefaz/everybotty-slackbot/main/icons/git-emoji.jpeg"
     },
     "angry-bot":{
         "icon_emoji": ":angry:"
