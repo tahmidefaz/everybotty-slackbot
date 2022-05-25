@@ -1,3 +1,4 @@
 env/*
 Makefile
 __pycache__
+.DS_Store
