@@ -4,6 +4,8 @@ import requests
 from slack_bolt import App
 from slack_sdk.web import WebClient
 
+from blocks import get_personality_blocks
+
 app = App()
 
 CHATBOT_API_BASEURL = os.environ.get("CHATBOT_API_BASEURL", "")
@@ -92,6 +94,10 @@ def handle_mention(body, say, logger):
     msg_ts = body["event"]["ts"]
     text = body["event"]["text"]
     bots_info = get_personalities()
+
+    blocks = get_personality_blocks(bots_info)
+    block_elements = blocks["blocks"]
+
     personalities = [p["id"] for p in bots_info]
     if not personalities:
         say(f"One of my internal API is down. Sorry, I can\'t respond right now. :sob:")
@@ -101,16 +107,16 @@ def handle_mention(body, say, logger):
     splitted_message = text.split(" ")
 
     if len(splitted_message) < 2:
-        say(f'Usage: `@Everybotty personalities`')
+        say("", blocks=block_elements)
         return
 
     if len(splitted_message) == 2 and splitted_message[-1] == "personalities":
-        say(f'Here are the available personalities:\n{" ".join(formatted_personalities)}\nUsage: `@Everybotty bot-personality`\n')
+        say("", blocks=block_elements)
         return
 
     bot_personality = splitted_message[1]
     if bot_personality not in personalities:
-        say(f'Bot personality, {bot_personality}, does not exist.\nUsage: `@Everybotty bot-personality`\nAvailable personalities:\n{" ".join(formatted_personalities)}')
+        say(f'Bot personality, {bot_personality}, does not exist.\nTry: `@Everybotty personalities`')
         return
 
     bot_info = get_bot_info(bot_personality, bots_info)
