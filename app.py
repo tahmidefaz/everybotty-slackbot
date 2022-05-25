@@ -4,6 +4,8 @@ import requests
 from slack_bolt import App
 from slack_sdk.web import WebClient
 
+from bot_info import BOT_ICONS
+
 app = App()
 
 CHATBOT_API_BASEURL = os.environ.get("CHATBOT_API_BASEURL", "")
@@ -17,9 +19,7 @@ def get_personalities():
     if response.status_code != 200:
         return None
 
-    response_json = response.json()
-
-    return [p["id"] for p in response_json]
+    return response.json()
 
 def check_personality(available_personality, personality):
     if not available_personality:
@@ -51,6 +51,12 @@ def format_prompts(prompts):
     return prompt_string
 
 
+def get_bot_info(bot_personality, bots_info):
+    for bot in bots_info:
+        if bot["id"] == bot_personality:
+            return bot
+
+
 def is_reply(message) -> bool:
     return message.get("subtype") != "bot_message" and message.get("thread_ts") in listening_threads
 
@@ -63,6 +69,8 @@ def handle_reply(logger, event, say):
     text = event["text"]
 
     bot_type = listening_threads[msg_ts]["type"]
+    bot_name = listening_threads[msg_ts]["name"]
+    extra_configs = listening_threads[msg_ts]["extra"]
     prompts = listening_threads[msg_ts]["prompts"]
     prompts.append(text)
 
@@ -74,7 +82,7 @@ def handle_reply(logger, event, say):
     bot_response = send_prompt(bot_type, formatted_prompts)
     if bot_response:
         prompts.append(bot_response)
-        say(text=bot_response, thread_ts=msg_ts, username=bot_type, icon_emoji=":smile:")
+        say(text=bot_response, thread_ts=msg_ts, username=bot_name, **extra_configs)
 
         listening_threads[msg_ts]["prompts"] = prompts
 
@@ -85,7 +93,8 @@ def handle_reply(logger, event, say):
 def handle_mention(body, say, logger):
     msg_ts = body["event"]["ts"]
     text = body["event"]["text"]
-    personalities = get_personalities()
+    bots_info = get_personalities()
+    personalities = [p["id"] for p in bots_info]
     if not personalities:
         say(f"One of my internal API is down. Sorry, I can\'t respond right now. :sob:")
         return
@@ -106,8 +115,13 @@ def handle_mention(body, say, logger):
         say(f'Bot personality, {bot_personality}, does not exist.\nUsage: `@Everybotty bot-personality`\nAvailable personalities:\n{" ".join(formatted_personalities)}')
         return
 
-    say(thread_ts=msg_ts, text=f'You are now talking with {bot_personality}\nReply in this thread to continue the conversation! :robot_face:')
-    listening_threads[msg_ts] = {"type":bot_personality, "prompts":[]}
+    bot_info = get_bot_info(bot_personality, bots_info)
+    extra_bot_info = dict()
+    if BOT_ICONS.get(bot_personality):
+        extra_bot_info = BOT_ICONS[bot_personality]
+
+    say(thread_ts=msg_ts, text=f'You are now talking with {bot_info["name"]}\n{bot_info["description"]}\nReply in this thread to continue the conversation! :robot_face:')
+    listening_threads[msg_ts] = {"type":bot_info["id"], "name": bot_info["name"], "prompts":[], "extra": extra_bot_info}
 
     return
 
