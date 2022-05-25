@@ -52,7 +52,7 @@ def format_prompts(prompts):
 
 
 def is_reply(message) -> bool:
-    return message.get("subtype") != "message_replied" and message.get("thread_ts") in listening_threads
+    return message.get("subtype") != "bot_message" and message.get("thread_ts") in listening_threads
 
 @app.event(
     event="message",
@@ -74,7 +74,7 @@ def handle_reply(logger, event, say):
     bot_response = send_prompt(bot_type, formatted_prompts)
     if bot_response:
         prompts.append(bot_response)
-        say(text=bot_response, thread_ts=msg_ts)
+        say(text=bot_response, thread_ts=msg_ts, username=bot_type, icon_emoji=":smile:")
 
         listening_threads[msg_ts]["prompts"] = prompts
 
