@@ -4,8 +4,6 @@ import requests
 from slack_bolt import App
 from slack_sdk.web import WebClient
 
-from bot_info import BOT_ICONS
-
 app = App()
 
 CHATBOT_API_BASEURL = os.environ.get("CHATBOT_API_BASEURL", "")
@@ -116,12 +114,9 @@ def handle_mention(body, say, logger):
         return
 
     bot_info = get_bot_info(bot_personality, bots_info)
-    extra_bot_info = dict()
-    if BOT_ICONS.get(bot_personality):
-        extra_bot_info = BOT_ICONS[bot_personality]
 
     say(thread_ts=msg_ts, text=f'You are now talking with {bot_info["name"]}\n{bot_info["description"]}\nReply in this thread to continue the conversation! :robot_face:')
-    listening_threads[msg_ts] = {"type":bot_info["id"], "name": bot_info["name"], "prompts":[], "extra": extra_bot_info}
+    listening_threads[msg_ts] = {"type":bot_info["id"], "name": bot_info["name"], "prompts":[], "extra": bot_info["slack_config"]}
 
     return
 
