@@ -5,7 +5,7 @@ import requests
 from slack_bolt import App
 from slack_sdk.web import WebClient
 
-from blocks import get_personality_blocks
+from blocks import get_personality_blocks, get_commands_block
 
 app = App()
 
@@ -108,7 +108,7 @@ def handle_mention(body, say, logger):
         say(f"One of my internal API is down. Sorry, I can\'t respond right now. :sob:")
         return
 
-    regex_string = "\\b(personalities|" + "|".join(personalities)+")\\b"
+    regex_string = "\\b(help|commands|personalities|" + "|".join(personalities)+")\\b"
     matches = re.findall(regex_string, text)
 
     if len(matches) < 1:
@@ -120,6 +120,9 @@ def handle_mention(body, say, logger):
     if first_match == "personalities":
         say("", blocks=block_elements)
         return
+
+    if first_match == "help" or first_match == "commands":
+        say("", blocks=get_commands_block())
 
     bot_personality = first_match
 

@@ -30,3 +30,7 @@ def get_personality_blocks(personalities):
     template["blocks"] = [*template_blocks, *footers]
 
     return template
+
+
+def get_commands_block():
+    return [{ "type": "section", "text": { "type": "mrkdwn", "text": "*Here are the available bot commands* :robot_face: :boom:" }},{"type": "divider"},{"type": "section","text": {"type": "mrkdwn","text": "Show the available personalities:\n```@Everybotty```\n```@Everybotty personalities```"}},{"type": "section","text": {"type": "mrkdwn","text": "Talk to one of the chatbots:\n```@Everybotty bot-personality```"}},{"type": "section","text": {"type": "mrkdwn","text": "Show this message:\n```@Everybotty commands```\n```@Everybotty help```"}}]
