@@ -97,7 +97,7 @@ def handle_mention(body, say, logger):
         return
 
     msg_ts = body["event"]["ts"]
-    text = body["event"]["text"]
+    text = body["event"]["text"].lower()
     bots_info = get_personalities()
 
     blocks = get_personality_blocks(bots_info)
