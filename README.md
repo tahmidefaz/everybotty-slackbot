@@ -56,3 +56,6 @@ That should be all you need. Install the app in a slack workspace, add it to a c
   * `@Everybotty personalities`
 * Talk with a specific chatbot
   * `@Everybotty <bot-personality>`
+* Show available commands
+  * `@Everybotty commands`
+  * `@Everybotty help`
