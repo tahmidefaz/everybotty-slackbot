@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import requests
 from slack_bolt import App
 from slack_sdk.web import WebClient
@@ -11,7 +12,7 @@ app = App()
 CHATBOT_API_BASEURL = os.environ.get("CHATBOT_API_BASEURL", "")
 CHATBOT_AUTH_KEY = os.environ.get("CHATBOT_AUTH_KEY", "")
 
-#{"ts1":{"type":"bot-type", "prompts":["message","response","message"]},}
+#{"ts1":{"type":"bot-type", "prompts":["message","response","message"]},"extra":{"icon_emoji": ":something:"}}
 listening_threads = dict()
 
 def get_personalities():
@@ -64,7 +65,7 @@ def is_reply(message) -> bool:
     event="message",
     matchers=[is_reply]
 )
-def handle_reply(logger, event, say):
+def handle_reply(logger, event, say, body):
     msg_ts = event['thread_ts']
     text = event["text"]
 
@@ -91,6 +92,10 @@ def handle_reply(logger, event, say):
 
 @app.event("app_mention")
 def handle_mention(body, say, logger):
+    if "thread_ts" in body["event"]:
+        say(text="Sorry, I have no power here. Please send a new message to the channel.", thread_ts=body["event"]["thread_ts"])
+        return
+
     msg_ts = body["event"]["ts"]
     text = body["event"]["text"]
     bots_info = get_personalities()
@@ -103,21 +108,20 @@ def handle_mention(body, say, logger):
         say(f"One of my internal API is down. Sorry, I can\'t respond right now. :sob:")
         return
 
-    formatted_personalities = list(map(lambda x: f"`{x}`", personalities))
-    splitted_message = text.split(" ")
+    regex_string = "\\b(personalities|" + "|".join(personalities)+")\\b"
+    matches = re.findall(regex_string, text)
 
-    if len(splitted_message) < 2:
+    if len(matches) < 1:
         say("", blocks=block_elements)
         return
 
-    if len(splitted_message) == 2 and splitted_message[-1] == "personalities":
+    first_match = matches[0]
+
+    if first_match == "personalities":
         say("", blocks=block_elements)
         return
 
-    bot_personality = splitted_message[1]
-    if bot_personality not in personalities:
-        say(f'Bot personality, {bot_personality}, does not exist.\nTry: `@Everybotty personalities`')
-        return
+    bot_personality = first_match
 
     bot_info = get_bot_info(bot_personality, bots_info)
 
